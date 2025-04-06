@@ -9,9 +9,9 @@ I'm doing it in Zig.
 - [x] Day 1
   - [x] puzzle 1
   - [x] puzzle 2
-- [ ] Day 2
-  - [ ] puzzle 1
-  - [ ] puzzle 2
+- [x] Day 2
+  - [x] puzzle 1
+  - [x] puzzle 2
 - [ ] Day 3
   - [ ] puzzle 1
   - [ ] puzzle 2
