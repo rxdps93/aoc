@@ -1,23 +1,18 @@
 const std = @import("std");
+const input = @embedFile("input.txt");
 
 pub fn main() !void {
-    const file = try std.fs.cwd().openFile("input.txt", .{});
-    defer file.close();
-
-    var reader = std.io.bufferedReader(file.reader());
-    var stream = reader.reader();
-
-    var buffer: [1024]u8 = undefined;
     var diffs: std.ArrayList(i8) = undefined;
 
     var safe: u16 = 0;
-    while (try stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
+    var iter = std.mem.tokenize(u8, input, "\n");
+    while (iter.next()) |token| {
         diffs = std.ArrayList(i8).init(std.heap.page_allocator);
-        var iter = std.mem.split(u8, line, " ");
-        while (iter.next()) |x| {
+        var line = std.mem.split(u8, token, " ");
+        while (line.next()) |x| {
             const level = try std.fmt.parseInt(i8, x, 10);
 
-            const y = iter.peek();
+            const y = line.peek();
             if (y != null) {
                 const next = try std.fmt.parseInt(i8, y.?, 10);
                 try diffs.append(next - level);
@@ -47,6 +42,5 @@ pub fn main() !void {
 
         diffs.deinit();
     }
-
     std.debug.print("{d}\n", .{safe});
 }

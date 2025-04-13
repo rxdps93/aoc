@@ -1,15 +1,16 @@
 const std = @import("std");
+const input = @embedFile("input.txt");
 
-fn line_ctoi(line: []u8) ![]i8 {
-    var iline = std.ArrayList(i8).init(std.heap.page_allocator);
+fn line_ctoi(line: []const u8) ![]i8 {
+    var int_line = std.ArrayList(i8).init(std.heap.page_allocator);
 
     var iter = std.mem.split(u8, line, " ");
     while (iter.next()) |x| {
         const val = try std.fmt.parseInt(i8, x, 10);
-        try iline.append(val);
+        try int_line.append(val);
     }
 
-    return iline.toOwnedSlice();
+    return int_line.toOwnedSlice();
 }
 
 fn calculate_diffs(list: *std.ArrayList(i8), line: []i8) !void {
@@ -47,24 +48,19 @@ fn check_record_safety(line: []i8) !bool {
 }
 
 pub fn main() !void {
-    const file = try std.fs.cwd().openFile("input.txt", .{});
-    defer file.close();
-
-    var reader = std.io.bufferedReader(file.reader());
-    var stream = reader.reader();
-
-    var buffer: [1024]u8 = undefined;
     var safe: u16 = 0;
-    while (try stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
-        const iline = try line_ctoi(line);
 
-        if (try check_record_safety(iline)) {
+    var iter = std.mem.tokenize(u8, input, "\n");
+    while (iter.next()) |line| {
+        const int_line = try line_ctoi(line);
+
+        if (try check_record_safety(int_line)) {
             safe += 1;
         } else {
             var new_line: std.ArrayList(i8) = undefined;
-            for (0..iline.len) |i| {
+            for (0..int_line.len) |i| {
                 new_line = std.ArrayList(i8).init(std.heap.page_allocator);
-                try new_line.appendSlice(iline);
+                try new_line.appendSlice(int_line);
                 _ = new_line.orderedRemove(i);
 
                 if (try check_record_safety(new_line.items)) {
@@ -75,6 +71,5 @@ pub fn main() !void {
             new_line.deinit();
         }
     }
-
     std.debug.print("{d}\n", .{safe});
 }
