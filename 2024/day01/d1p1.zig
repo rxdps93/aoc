@@ -1,30 +1,26 @@
 const std = @import("std");
+const input = @embedFile("input.txt");
 
 pub fn main() !void {
-    const file = try std.fs.cwd().openFile("input.txt", .{});
-    defer file.close();
+    var token_iter = std.mem.tokenize(u8, input, " \n\t");
 
-    var reader = std.io.bufferedReader(file.reader());
-    var stream = reader.reader();
-
-    var buffer: [1024]u8 = undefined;
     var left = std.ArrayList(i32).init(std.heap.page_allocator);
     var right = std.ArrayList(i32).init(std.heap.page_allocator);
 
     defer left.deinit();
     defer right.deinit();
 
-    while (try stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
-        var iter = std.mem.split(u8, line, "   ");
-        while (iter.next()) |x| {
-            const value = try std.fmt.parseInt(i32, x, 10);
+    var arr: u1 = 0;
+    while (token_iter.next()) |token| {
+        const value = try std.fmt.parseInt(i32, token, 10);
 
-            if (left.items.len == right.items.len) {
-                try left.append(value);
-            } else {
-                try right.append(value);
-            }
+        if (arr == 0) {
+            try left.append(value);
+        } else {
+            try right.append(value);
         }
+
+        arr = 1 - arr;
     }
 
     std.mem.sort(i32, left.items, {}, comptime std.sort.asc(i32));
