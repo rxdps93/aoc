@@ -8,6 +8,7 @@ Advent of Code
 - 2017
     - [ ] Python (6/25)
 - 2018 (Not Started)
+    - [ ] Odin (0/25)
 - 2019 (Not Started)
 - 2020 (Not Started)
 - 2021
@@ -18,3 +19,4 @@ Advent of Code
     - [ ] Rust (2/25)
 - 2024
     - [ ] Zig (2/25)
+- 2025 (Not Started)
