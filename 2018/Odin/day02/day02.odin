@@ -74,6 +74,8 @@ main :: proc() {
     data, err := os.read_entire_file("input.txt", context.allocator)
     if err != nil do return
 
+    defer delete(data, context.allocator)
+
     iter := string(data)
     fmt.printf("%d\n%s\n", d2p1(iter), d2p2(iter))
 }
