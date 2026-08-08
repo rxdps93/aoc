@@ -119,7 +119,75 @@ d4p1 :: proc(data: string) -> int {
 }
 
 d4p2 :: proc(data: string) -> int {
-    return -1
+    lines := strings.split_lines(data, context.allocator)
+    defer delete(lines)
+
+    log := make(map[int]int)
+    defer delete(log)
+
+    freq := make(map[int][60]int)
+    defer delete(freq)
+
+    slice.sort_by(lines[:], sort_datetime)
+
+    id_pattern := `\#(\d+)`
+    reg, err := regex.create(id_pattern)
+    if err != nil {
+        fmt.eprintf("A significant oopsie has occurred: %v\n", err)
+        return -1
+    }
+    defer regex.destroy(reg)
+
+    // calculate minutes asleep per guard
+    active_id := -1
+    sleeping := false
+    start: datetime.DateTime
+    for line in lines {
+        c, m := regex.match(reg, line)
+
+        if m {
+            active_id, _ = strconv.parse_int(c.groups[1])
+            sleeping = false
+            start = {}
+        } else if strings.contains(line, "asleep") {
+            sleeping = true
+            start = parse_datetime(line)
+        } else {
+            sleeping = false
+        }
+
+        if !sleeping && start != {} {
+            asleep_for := minute_diff(start, parse_datetime(line))
+            log[active_id] += asleep_for
+
+            if !(active_id in freq) do freq[active_id] = [60]int{}
+            ptr := &freq[active_id]
+
+            sm := int(start.minute)
+            for m in 0..<asleep_for {
+                idx := sm + m
+
+                if idx == 60 do idx = 0
+
+                ptr[idx] += 1
+            }
+        }
+    }
+
+    max := -1
+    max_id := -1
+    max_times := -1
+    for k,v in freq {
+        arr := v
+        max_minute, _ := slice.max_index(arr[:])
+        if arr[max_minute] > max_times {
+            max = max_minute
+            max_id = k
+            max_times = arr[max_minute]
+        }
+    }
+
+    return max_id * max
 }
 
 main :: proc() {
