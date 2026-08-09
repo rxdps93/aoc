@@ -34,9 +34,8 @@ sort_datetime :: proc(a, b: string) -> bool {
     if dta.month != dtb.month   do return dta.month < dtb.month
     if dta.day != dtb.day       do return dta.day < dtb.day
     if dta.hour != dtb.hour     do return dta.hour < dtb.hour
-    if dta.minute != dtb.minute do return dta.minute < dtb.minute
 
-    return dta.second < dtb.second
+    return dta.minute < dtb.minute
 }
 
 minute_diff :: proc(start, end: datetime.DateTime) -> int {
@@ -46,7 +45,7 @@ minute_diff :: proc(start, end: datetime.DateTime) -> int {
     return int(time.duration_minutes(time.diff(ta, tb)))
 }
 
-d4p1 :: proc(data: string) -> int {
+parse_input :: proc(data: string) -> (map[int]int, map[int][60]int) {
     lines := strings.split_lines(data, context.allocator)
     defer delete(lines)
 
@@ -59,11 +58,7 @@ d4p1 :: proc(data: string) -> int {
     slice.sort_by(lines[:], sort_datetime)
 
     id_pattern := `\#(\d+)`
-    reg, err := regex.create(id_pattern)
-    if err != nil {
-        fmt.eprintf("A significant oopsie has occurred: %v\n", err)
-        return -1
-    }
+    reg, _ := regex.create(id_pattern)
     defer regex.destroy(reg)
 
     // calculate minutes asleep per guard
@@ -101,6 +96,12 @@ d4p1 :: proc(data: string) -> int {
             }
         }
     }
+    return log, freq
+}
+
+d4p1 :: proc(data: string) -> int {
+    
+    log, freq := parse_input(data)
 
     // get sleepiest guard's id
     max := -1
@@ -119,60 +120,7 @@ d4p1 :: proc(data: string) -> int {
 }
 
 d4p2 :: proc(data: string) -> int {
-    lines := strings.split_lines(data, context.allocator)
-    defer delete(lines)
-
-    log := make(map[int]int)
-    defer delete(log)
-
-    freq := make(map[int][60]int)
-    defer delete(freq)
-
-    slice.sort_by(lines[:], sort_datetime)
-
-    id_pattern := `\#(\d+)`
-    reg, err := regex.create(id_pattern)
-    if err != nil {
-        fmt.eprintf("A significant oopsie has occurred: %v\n", err)
-        return -1
-    }
-    defer regex.destroy(reg)
-
-    // calculate minutes asleep per guard
-    active_id := -1
-    sleeping := false
-    start: datetime.DateTime
-    for line in lines {
-        c, m := regex.match(reg, line)
-
-        if m {
-            active_id, _ = strconv.parse_int(c.groups[1])
-            sleeping = false
-            start = {}
-        } else if strings.contains(line, "asleep") {
-            sleeping = true
-            start = parse_datetime(line)
-        } else {
-            sleeping = false
-        }
-
-        if !sleeping && start != {} {
-            asleep_for := minute_diff(start, parse_datetime(line))
-            log[active_id] += asleep_for
-
-            if !(active_id in freq) do freq[active_id] = [60]int{}
-            ptr := &freq[active_id]
-
-            sm := int(start.minute)
-            for m in 0..<asleep_for {
-                idx := sm + m
-
-                if idx == 60 do idx = 0
-
-                ptr[idx] += 1
-            }
-        }
-    }
+    log, freq := parse_input(data)
 
     max := -1
     max_id := -1
