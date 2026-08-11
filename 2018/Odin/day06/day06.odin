@@ -80,8 +80,6 @@ d6p1 :: proc(data: string) -> int {
         }
     }
 
-    // for id in blacklist do delete_key(&coords, id)
-
     areas := make(map[int]int)
     defer delete(areas)
     max_area := min(int)
@@ -97,7 +95,42 @@ d6p1 :: proc(data: string) -> int {
 }
 
 d6p2 :: proc(data: string) -> int {
-    return -1
+    coords := make([dynamic]Coord)
+    defer delete(coords)
+
+    xmin := max(int)
+    xmax := min(int)
+    ymin := max(int)
+    ymax := min(int)
+
+    lines := data
+    for line in strings.split_lines_iterator(&lines) {
+        split, _ := strings.split(line, ", ", context.temp_allocator)
+
+        x, _ := strconv.parse_int(split[0])
+        y, _ := strconv.parse_int(split[1])
+
+        if x < xmin do xmin = x
+        if x > xmax do xmax = x
+        if y < ymin do ymin = y
+        if y > ymax do ymax = y
+
+        append(&coords, Coord{x, y})
+    }
+
+    region := 0
+    for y in ymin..=ymax {
+        for x in xmin..=xmax {
+            dist := 0
+            for coord in coords {
+                dist += calc_dist({x, y}, coord)
+            }
+
+            if dist < 10000 do region += 1
+        }
+    }
+
+    return region
 }
 
 main :: proc() {
