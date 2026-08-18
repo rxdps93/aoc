@@ -4,7 +4,6 @@ import "core:os"
 import "core:fmt"
 import "core:strings"
 import "core:strconv"
-import "core:mem"
 
 Node :: struct {
     children: [dynamic]Node,
@@ -50,8 +49,18 @@ d8p1 :: proc(node: ^Node, sum: ^int) {
     for &child in node.children do d8p1(&child, sum)
 }
 
-d8p2 :: proc() -> int {
-    return -1
+d8p2 :: proc(node: ^Node, value: ^int) {
+    if node == nil do return
+
+    for md in node.metadata {
+        if len(node.children) == 0 {
+            value^ += md
+        } else {
+            if md != 0 && md <= len(node.children) {
+                d8p2(&node.children[md - 1], value)
+            }
+        }
+    }
 }
 
 main :: proc() {
@@ -78,5 +87,8 @@ main :: proc() {
 
     p1 := 0
     d8p1(&tree, &p1)
-    fmt.printf("%d\n%d\n", p1, d8p2())
+
+    p2 := 0
+    d8p2(&tree, &p2)
+    fmt.printf("%d\n%d\n", p1, p2)
 }
