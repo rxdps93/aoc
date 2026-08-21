@@ -5,50 +5,31 @@ import "core:fmt"
 import "core:strings"
 import "core:strconv"
 import "core:slice"
+import "core:container/queue"
 
-print_circle :: proc(circle: [dynamic]int, current: int, player: int = -1) {
-    if player == -1 {
-        fmt.printf("[-] ")
-    } else {
-        fmt.printf("[%d] ", player)
-    }
-
-    for m, idx in circle {
-        if idx == current {
-            fmt.printf("(%d)", m)
-        } else {
-            fmt.printf(" %d ", m)
-        }
-    }
-    fmt.println()
-}
-
-slow_marble_game :: proc(players: int, marbles: int) -> i64 {
+marble_game :: proc(players: int, marbles: int) -> i64 {
     scores := make([]i64, players, context.temp_allocator)
-    circle := make([dynamic]int, context.temp_allocator)
-    append(&circle, 0)
+    circle: queue.Queue(int)
+    queue.init(&circle)
+    defer queue.destroy(&circle)
+
+    queue.push_back(&circle, 0)
 
     p_curr := 0 // whose turn it is
-    m_curr := 0 // idx of the current marble
     marble := 1 // value of the marble to place
     for marble <= marbles {
-        if marble%23 == 0 {
-            r_idx := (m_curr - 7) % len(circle)
-            if r_idx < 0 do r_idx += len(circle)
-            scores[p_curr] += i64(marble + circle[r_idx])
-
-            ordered_remove_dynamic_array(&circle, r_idx)
-            m_curr = r_idx
-        } else {
-            n_curr := m_curr + 2
-            if n_curr == len(circle) {
-                append(&circle, marble)
-            } else {
-                if n_curr > len(circle) do n_curr -= len(circle)
-
-                inject_at(&circle, n_curr, marble)
+        if marble % 23 == 0 {
+            for _ in 0..<7 {
+                m := queue.pop_back(&circle)
+                queue.push_front(&circle, m)
             }
-            m_curr = n_curr
+            scores[p_curr] += i64(marble + queue.pop_front(&circle))
+        } else {
+            for _ in 0..<2 {
+                m := queue.pop_front(&circle)
+                queue.push_back(&circle, m)
+            }
+            queue.push_front(&circle, marble)
         }
 
         marble += 1
@@ -72,6 +53,5 @@ main :: proc() {
     delete(input)
     delete(data)
 
-    // fmt.printf("%d\n%d\n", marble_game(players, marbles), marble_game(players, marbles * 100))
-    fmt.printf("%d\n", slow_marble_game(players, marbles))
+    fmt.printf("%d\n%d\n", marble_game(players, marbles), marble_game(players, marbles * 100))
 }
