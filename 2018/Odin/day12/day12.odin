@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:os"
 import "core:strings"
+import "core:slice"
 
 main :: proc() {
     input, err := os.read_entire_file("input.txt", context.allocator)
@@ -34,7 +35,12 @@ main :: proc() {
         rules[rule] = line[9] == '#' ? 1 : 0
     }
 
-    for _ in 1..=20 {
+    d12p1 := 0
+    d12p2: i64 = 0
+    prev_pattern: [dynamic]int
+    shift, gen := 0, 0
+    for g in 1..=50000000000 {
+        prev_min := min_pot
         next := make(map[int]bool)
         next_min, next_max := max(int), min (int)
 
@@ -55,11 +61,33 @@ main :: proc() {
         state = next
         min_pot = next_min
         max_pot = next_max
-    }
 
-    sum := 0
-    for k,v in state {
-        sum += k
+        pattern: [dynamic]int
+        defer delete(pattern)
+
+        for k,_ in state {
+            append(&pattern, k - min_pot)
+        }
+        slice.sort(pattern[:])
+
+        if slice.equal(pattern[:], prev_pattern[:]) {
+            shift = min_pot - prev_min
+            gen = g
+            for k, _ in state do d12p2 += i64(k)
+            break
+        }
+
+        delete(prev_pattern)
+        prev_pattern = slice.clone_to_dynamic(pattern[:])
+
+        if g == 20 {
+            for k,_ in state do d12p1 += k
+        }
     }
-    fmt.printf("%d\n", sum)
+    delete(prev_pattern)
+
+    fmt.printf("After 20 generations: %d\n", d12p1)
+
+    d12p2 = d12p2 + (50000000000 - i64(gen)) * (i64(shift) * i64(len(state)))
+    fmt.printf("After 50 billion generations: %d\n", d12p2)
 }

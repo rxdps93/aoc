@@ -39,9 +39,9 @@ I'm doing it in Odin.
 - [x] Day 11
   - [x] puzzle 1
   - [x] puzzle 2
-- [ ] Day 12
+- [x] Day 12
   - [x] puzzle 1
-  - [ ] puzzle 2
+  - [x] puzzle 2
 - [ ] Day 13
   - [ ] puzzle 1
   - [ ] puzzle 2
