@@ -83,29 +83,14 @@ main :: proc() {
         }
     }
 
-    active_carts := len(carts)
     first_crash := Vector{-1, -1}
-    for active_carts > 1 {
+    for len(carts) > 1 {
         slice.sort_by(carts[:], proc(a, b: Cart) -> bool {
             if a.coords.y == b.coords.y do return a.coords.x < b.coords.x
             return a.coords.y < b.coords.y
         })
 
         for &cart, i in carts {
-            /*
-             * > check if crashed, if so continue. otherwise:
-             * > add heading to coords
-             * > check for crash:
-             * > if crash:
-             *      > mark both as crashed
-             *      > continue
-             * > if no crash:
-             *      > if ending on a curve (/ or \):
-             *          > update heading accordingly
-             *      > else if ending on an intersection (+):
-             *          > update heading based on turn
-             *          > increment turn to next in list
-             */
             if cart.crashed do continue
 
             cart.coords += cart.heading
@@ -114,7 +99,6 @@ main :: proc() {
                 if cart.coords == other.coords {
                     cart.crashed = true
                     other.crashed = true
-                    active_carts -= 2
 
                     if first_crash == {-1, -1} do first_crash = cart.coords
 
@@ -131,7 +115,12 @@ main :: proc() {
                 cart.turn = cast(Direction)((cast(int)cart.turn + 1) % len(Direction))
             }
         }
+
+        for i := len(carts) - 1; i >= 0; i -= 1 {
+            if carts[i].crashed do unordered_remove(&carts, i)
+        }
     }
 
     fmt.printf("The first crash is at %d,%d\n", first_crash.x, first_crash.y)
+    fmt.printf("The last cart is at %d,%d\n", carts[0].coords.x, carts[0].coords.y)
 }
