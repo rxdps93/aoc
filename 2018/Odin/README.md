@@ -54,9 +54,9 @@ I'm doing it in Odin.
 - [x] Day 16
   - [x] puzzle 1
   - [x] puzzle 2
-- [ ] Day 17
-  - [ ] puzzle 1
-  - [ ] puzzle 2
+- [x] Day 17
+  - [x] puzzle 1
+  - [x] puzzle 2
 - [ ] Day 18
   - [ ] puzzle 1
   - [ ] puzzle 2
