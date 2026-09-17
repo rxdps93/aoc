@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:os"
 import "core:strings"
+import "core:hash"
 
 Vector :: [2]int
 
@@ -47,13 +48,13 @@ determine_next_state :: proc(acre: ^Acre, adj_open, adj_wood, adj_lumb: int) {
     }
 }
 
-print_resource_value :: proc(plot: []Acre, size: Vector) {
+get_resource_value :: proc(plot: []Acre, size: Vector) -> int {
     wood, lumb := 0, 0
     for acre in plot {
         if acre.currentState == .Wooded do wood += 1
         if acre.currentState == .Lumberyard do lumb += 1
     }
-    fmt.printf("%d * %d = %d\n", wood, lumb, wood * lumb)
+    return wood * lumb
 }
 
 main :: proc() {
@@ -72,17 +73,36 @@ main :: proc() {
         }
     }
 
-    for min in 0..<10 {
+    plot_history := make(map[u64]int, context.temp_allocator)
+    scores := make([dynamic]int, context.temp_allocator)
+    start, end := 0, 0
+    hash_buf := make([]u8, size.x * size.y, context.temp_allocator)
+    for min in 0..<1_000_000_000 {
         // figure out next state
         for &acre in plot {
             determine_next_state(&acre, tally_adjacent_acres(plot, size, acre.coords))
         }
 
-        // apply next state
-        for &acre in plot {
+        // apply next state and populate hash buffer
+        for &acre, idx in plot {
             acre.currentState = acre.nextState
+            hash_buf[idx] = u8(acre.currentState)
         }
+
+        hash := hash.fnv64a(hash_buf[:])
+        prev_min, exists := plot_history[hash]
+        if exists {
+            // we found our loop
+            start = prev_min
+            end = min
+            break
+        } else {
+            plot_history[hash] = min
+        }
+
+        append(&scores, get_resource_value(plot, size))
     }
 
-    print_resource_value(plot, size)
+    target := start + ((999_999_999 - start) % (end - start))
+    fmt.printf("%d\n%d\n", scores[9], scores[target])
 }
