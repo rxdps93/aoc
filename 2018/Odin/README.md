@@ -63,9 +63,9 @@ I'm doing it in Odin.
 - [x] Day 19
   - [x] puzzle 1
   - [x] puzzle 2
-- [ ] Day 20
-  - [ ] puzzle 1
-  - [ ] puzzle 2
+- [x] Day 20
+  - [x] puzzle 1
+  - [x] puzzle 2
 - [ ] Day 21
   - [ ] puzzle 1
   - [ ] puzzle 2
