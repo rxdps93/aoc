@@ -72,9 +72,9 @@ I'm doing it in Odin.
 - [x] Day 22
   - [x] puzzle 1
   - [x] puzzle 2
-- [ ] Day 23
+- [x] Day 23
   - [x] puzzle 1
-  - [ ] puzzle 2
+  - [x] puzzle 2
 - [ ] Day 24
   - [ ] puzzle 1
   - [ ] puzzle 2
