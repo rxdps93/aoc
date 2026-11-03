@@ -1,6 +1,6 @@
 # Advent of Code 2024
 
-### 2015 In Progress!
+### 2024 In Progress!
 
 I'm doing it in Zig.
 
