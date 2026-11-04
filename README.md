@@ -12,7 +12,7 @@ Advent of Code
 - 2019 (Not Started)
 - 2020 (Not Started)
 - 2021
-    - [ ] C (22/25)
+    - [x] C
 - 2022
     - [x] Kotlin
 - 2023
