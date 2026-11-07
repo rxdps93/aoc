@@ -115,6 +115,34 @@ main :: proc() {
     target_square, _ := strconv.parse_int(strings.trim_space(string(input)))
 
     fmt.println(dist_sq(1, target_square))
+
+    sum := 0
+    sq := 2
+    mem := make(map[int]int, context.temp_allocator)
+    mem[1] = 1
+    vecs := [8][2]int{
+        { 0,  1},   // up
+        { 0, -1},   // down
+        {-1,  0},   // left
+        { 1,  0},   // right
+        { 1,  1},   // up+right
+        { 1, -1},   // up+left
+        {-1,  1},   // down+right
+        {-1, -1},   // down+left
+    }
+    for sum <= target_square {
+        sum = 0
+        x, y := square_to_coord(sq)
+        for vec in vecs {
+            s := coord_to_square(x + vec.x, y + vec.y)
+            if s not_in mem do continue
+            sum += mem[s]
+        }
+        mem[sq] = sum
+        sq += 1
+    }
+
+    fmt.println(sum)
 }
 
 /*
