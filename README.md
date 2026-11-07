@@ -7,7 +7,7 @@ Advent of Code
     - [ ] COBOL (10/25)
 - 2017
     - [ ] Python (6/25)
-    - [ ] Odin (3/25)
+    - [ ] Odin (4/25)
 - 2018 (Not Started)
     - [x] Odin
 - 2019 (Not Started)
