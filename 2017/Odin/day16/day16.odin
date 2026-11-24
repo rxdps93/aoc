@@ -37,6 +37,19 @@ partner :: proc(prgms: ^[16]u8, name_str: string) {
     swap(prgms, pos_a, pos_b)
 }
 
+perform_dance :: proc(prgms: [16]u8, instructions: []string) -> [16]u8 {
+    lineup := prgms
+    for instr in instructions {
+        switch instr[0] {
+            case 's': spin(&lineup, instr[1:])
+            case 'x': exchange(&lineup, instr[1:])
+            case 'p': partner(&lineup, instr[1:])
+        }
+    }
+
+    return lineup
+}
+
 main :: proc() {
     input, read_err := os.read_entire_file("input.txt", context.temp_allocator)
     if read_err != nil do return
@@ -44,13 +57,27 @@ main :: proc() {
 
     prgms: [16]u8
     for p, i in u8('a')..=u8('p') do prgms[i] = p
-    for instr in instructions {
-        switch instr[0] {
-            case 's': spin(&prgms, instr[1:])
-            case 'x': exchange(&prgms, instr[1:])
-            case 'p': partner(&prgms, instr[1:])
+    
+    // part 1
+    lineup := perform_dance(prgms, instructions)
+    fmt.println(string(lineup[:]))
+
+    // part 2
+    lineup = prgms
+    iterations := 0
+    for true {
+        lineup = perform_dance(lineup, instructions)
+        iterations += 1
+
+        if lineup == prgms {
+            break
         }
     }
 
-    fmt.println(string(prgms[:]))
+    lineup = prgms
+    for i in 0..<(1_000_000_000 % iterations) {
+        lineup = perform_dance(lineup, instructions)
+    }
+
+    fmt.println(string(lineup[:]))
 }
