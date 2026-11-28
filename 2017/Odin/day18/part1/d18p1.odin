@@ -1,4 +1,4 @@
-package main
+package d18p1
 
 import "core:fmt"
 import "core:os"
@@ -125,7 +125,7 @@ exec_instruction :: proc(state: ^State, instr: Instruction) -> (result: int, has
 }
 
 main :: proc() {
-    input, read_err := os.read_entire_file("input.txt", context.temp_allocator)
+    input, read_err := os.read_entire_file("../input.txt", context.temp_allocator)
     if read_err != nil do return
 
     lines := strings.split_lines(strings.trim_space(string(input)), context.temp_allocator)
